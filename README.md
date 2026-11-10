@@ -28,16 +28,26 @@ region (Cutoff: VTH ≤ VBE, Saturation: VCE < 0.3 V) โปรแกรมจ�
 
 ```
 BJT DC Bias Web App/
-├── app.py                  # Flask routes + แปลงหน่วย kΩ→Ω
+├── app.py                  # Flask routes + แปลงหน่วย kΩ→Ω + label วงจร
 ├── dc_bias.py              # engineering module (ไม่รู้จัก HTML/HTTP)
 ├── templates/index.html    # ฟอร์ม + ผลลัพธ์ (Jinja)
+├── templates/circuit.html  # แผนผังวงจร SVG + ค่า input/node voltage
 ├── static/style.css        # การแสดงผล
 ├── tests/
 │   ├── test_dc_bias.py     # unit tests วิศวกรรม (9 tests)
-│   └── test_web.py         # Flask test client tests (9 tests)
+│   └── test_web.py         # Flask test client tests (14 tests)
 ├── requirements.txt        # Flask
 └── docs/                   # design-note, validation, reflection
 ```
+
+## แผนผังวงจรบนหน้าเว็บ
+
+การ์ด **"Circuit: Common-Emitter Amplifier"** วาดด้วย SVG แสดงวงจร
+Voltage-Divider Bias พร้อม**ค่าที่กรอกกำกับบนตำแหน่งจริง** (R1, R2, RC,
+RE เป็น kΩ · VCC เป็น V · β/VBE ข้าง transistor) — ค่าอัปเดตทุกครั้งที่กด
+Calculate เมื่อคำนวณสำเร็จจะแสดง**แรงดันโหนด** VB, VE, VC (ตัวหนา) ที่ขา
+transistor ด้วย ฟิลด์ที่กรอกไม่ถูกต้อง (ไม่ใช่ตัวเลข, inf, ค่าติดลบ) จะ
+แสดงแค่ชื่ออุปกรณ์ ไม่ echo ค่านั้นขึ้นรูป
 
 ## การติดตั้งและรัน
 
@@ -73,7 +83,7 @@ flask --app app run --debug
 python -m unittest discover -s tests -v
 ```
 
-ผลที่คาดหวัง: **19 tests OK** (9 engineering + 10 web)
+ผลที่คาดหวัง: **23 tests OK** (9 engineering + 14 web)
 
 ## ชุดข้อมูลทดลอง
 

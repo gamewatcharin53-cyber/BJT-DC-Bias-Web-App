@@ -24,15 +24,17 @@ VCE = 8.052 V > 0.3 V และ VTH > VBE → **Active region** ไม่มี�
 
 คำสั่ง: `python -m unittest discover -s tests -v` (จาก root ของ repo, ใน venv)
 
-ผล: **Ran 19 tests — OK**
+ผล: **Ran 23 tests — OK**
 
 - `tests/test_dc_bias.py` — 9 tests วิศวกรรม: ค่าอ้างอิง, validation (R1=0,
   β=0, VCC ติดลบ), Cutoff warning, Saturation warning, ขอบเขต VTH=VBE,
   ค่าสุดขั้ว (β=10¹², VBE ติดลบ)
-- `tests/test_web.py` — 10 tests ผ่าน Flask test client: GET / (200 + ฟอร์ม),
+- `tests/test_web.py` — 14 tests ผ่าน Flask test client: GET / (200 + ฟอร์ม),
   POST ค่าถูกต้อง, กรอกไม่ใช่ตัวเลข (`abc`, `2,2`), ฟิลด์ขาด, R ติดลบ,
   ค่าไม่จำกัด (`inf`), คำเตือน Cutoff/Saturation แสดงบนหน้าเว็บ,
-  GET /calculate → 405
+  GET /calculate → 405, และแผนผังวงจร (GET / ยังไม่มีค่า, POST valid
+  ค่า input + VB/VE/VC ขึ้นบนรูป, ค่า invalid ไม่ถูก echo, Cutoff ยัง
+  แสดงค่า input)
 
 ## 3. ตรวจ HTTP จริงผ่าน Flask Server (เกณฑ์ A1, A2, A4, A5)
 
@@ -44,6 +46,9 @@ VCE = 8.052 V > 0.3 V และ VTH > VBE → **Active region** ไม่มี�
 | A2 · POST /calculate | กรอกชุดข้อมูลอ้างอิง | HTTP 200 + ค่า VCE=8.052 V, IC=1.230 mA จาก backend จริง ✓ |
 | A4 · Validation | กรอก R1 = "abc" | HTTP 200 + ข้อความ "R1 ต้องกรอกเป็นตัวเลข" หน้าไม่ล้ม ✓ |
 | A4 · Non-finite | กรอก VCC = "inf" | HTTP 200 + ข้อความ "VCC ต้องกรอกเป็นตัวเลข" ไม่แสดงตารางผล ✓ |
+| วงจร · GET / | เปิดหน้าแรก | HTTP 200 + การ์ด "Circuit: Common-Emitter Amplifier" โครงวงจรไม่มีค่า ✓ |
+| วงจร · POST valid | กรอกชุดข้อมูลอ้างอิง | HTTP 200 + "VCC = 12 V", "100 kΩ", "VB = 1.942 V" บนรูป ✓ |
+| วงจร · POST invalid | กรอก R1 = "abc" | HTTP 200 + ไม่มี "abc kΩ" บนรูป แต่ "22 kΩ" ยังแสดง ✓ |
 | A5 · Region warning | วงจร saturation (VCC=2 V, RC=390 Ω, RE=10 Ω) | HTTP 200 + คำเตือน Saturation ✓ |
 
 ## 4. Reproducibility (เกณฑ์ A7)
