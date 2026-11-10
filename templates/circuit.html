@@ -1,0 +1,70 @@
+<div class="card circuit-card">
+    <h2><svg class="icon-zig" width="24" height="14" viewBox="0 0 24 14" aria-hidden="true"><polyline points="1,7 4,7 6,2 10,12 14,2 18,12 20,7 23,7" fill="none" stroke="#0c8078" stroke-width="2.2"/></svg>
+        Circuit: Common-Emitter Amplifier</h2>
+    <div class="circuit-wrap">
+        <svg class="circuit" viewBox="0 0 520 412" role="img" aria-labelledby="cir-t cir-d">
+            <title id="cir-t">แผนผังวงจร BJT Common-Emitter แบบ Voltage-Divider Bias พร้อมค่า input และแรงดันโหนด</title>
+            <desc id="cir-d">R1 R2 แบ่งแรงดันฝั่งซ้าย RC บนขวา RE ล่างขวา transistor NPN Q1 ตรงกลาง ground สองจุด</desc>
+            <defs>
+                <marker id="npn-arrow" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto">
+                    <path d="M0,0 L5,2.5 L0,5 Z" fill="#1b2733"/>
+                </marker>
+            </defs>
+
+            <!-- ราง VCC -->
+            <line x1="140" y1="40" x2="335" y2="40" stroke="#1b2733" stroke-width="2"/>
+            <line x1="237.5" y1="40" x2="237.5" y2="22" stroke="#1b2733" stroke-width="2"/>
+            <text x="237.5" y="15" text-anchor="middle" font-size="15" font-weight="bold" fill="#1b2733">VCC{% if circuit.vcc %} = {{ circuit.vcc }}{% endif %}</text>
+
+            <!-- R1: VCC -> base -->
+            <polyline points="140,40 140,86 149,92 131,104 149,116 131,128 140,134 140,215" fill="none" stroke="#1b2733" stroke-width="2"/>
+            <text x="122" y="100" text-anchor="end" font-size="14" font-weight="bold" fill="#1b2733">R1</text>
+            {% if circuit.r1 %}<text x="122" y="118" text-anchor="end" font-size="13" fill="#1b2733">{{ circuit.r1 }}</text>{% endif %}
+
+            <!-- R2: base -> GND -->
+            <polyline points="140,215 140,275 149,281 131,287 149,299 131,311 140,317 140,380" fill="none" stroke="#1b2733" stroke-width="2"/>
+            <text x="122" y="289" text-anchor="end" font-size="14" font-weight="bold" fill="#1b2733">R2</text>
+            {% if circuit.r2 %}<text x="122" y="307" text-anchor="end" font-size="13" fill="#1b2733">{{ circuit.r2 }}</text>{% endif %}
+
+            <!-- ground ใต้ R2 -->
+            <line x1="140" y1="380" x2="140" y2="392" stroke="#1b2733" stroke-width="2"/>
+            <line x1="126" y1="392" x2="154" y2="392" stroke="#1b2733" stroke-width="2"/>
+            <line x1="131" y1="397" x2="149" y2="397" stroke="#1b2733" stroke-width="2"/>
+            <line x1="136" y1="402" x2="144" y2="402" stroke="#1b2733" stroke-width="2"/>
+
+            <!-- base wire + node -->
+            <line x1="140" y1="215" x2="300" y2="215" stroke="#1b2733" stroke-width="2"/>
+            <circle cx="140" cy="215" r="4" fill="#1b2733"/>
+
+            <!-- RC: VCC -> collector -->
+            <polyline points="335,40 335,76 344,82 326,94 344,106 326,118 335,124 335,168" fill="none" stroke="#1b2733" stroke-width="2"/>
+            <text x="352" y="92" font-size="14" font-weight="bold" fill="#1b2733">RC</text>
+            {% if circuit.rc %}<text x="352" y="110" font-size="13" fill="#1b2733">{{ circuit.rc }}</text>{% endif %}
+
+            <!-- Q1: NPN transistor -->
+            <circle cx="320" cy="215" r="48" fill="#fff" stroke="#1b2733" stroke-width="2"/>
+            <line x1="300" y1="190" x2="300" y2="240" stroke="#1b2733" stroke-width="3.5"/>
+            <line x1="335" y1="168" x2="300" y2="193" stroke="#1b2733" stroke-width="2"/>
+            <line x1="300" y1="237" x2="335" y2="262" stroke="#1b2733" stroke-width="2" marker-end="url(#npn-arrow)"/>
+            <text x="310" y="164" text-anchor="middle" font-size="13" font-weight="bold" fill="#1b2733">Q1</text>
+            <text x="380" y="210" font-size="13" fill="#1b2733">{{ circuit.npn }}</text>
+            {% if circuit.vbe_note %}<text x="380" y="228" font-size="12" fill="#546d83">{{ circuit.vbe_note }}</text>{% endif %}
+
+            <!-- RE: emitter -> GND -->
+            <polyline points="335,262 335,301 344,307 326,319 344,331 326,343 335,349 335,380" fill="none" stroke="#1b2733" stroke-width="2"/>
+            <text x="352" y="315" font-size="14" font-weight="bold" fill="#1b2733">RE</text>
+            {% if circuit.re %}<text x="352" y="333" font-size="13" fill="#1b2733">{{ circuit.re }}</text>{% endif %}
+
+            <!-- ground ใต้ RE -->
+            <line x1="335" y1="380" x2="335" y2="392" stroke="#1b2733" stroke-width="2"/>
+            <line x1="321" y1="392" x2="349" y2="392" stroke="#1b2733" stroke-width="2"/>
+            <line x1="326" y1="397" x2="344" y2="397" stroke="#1b2733" stroke-width="2"/>
+            <line x1="331" y1="402" x2="339" y2="402" stroke="#1b2733" stroke-width="2"/>
+
+            <!-- แรงดันโหนด (แสดงเมื่อคำนวณสำเร็จ) -->
+            {% if circuit.v_b %}<text x="158" y="205" font-size="14" font-weight="bold" fill="#1b2733">{{ circuit.v_b }}</text>{% endif %}
+            {% if circuit.v_c %}<text x="352" y="160" font-size="14" font-weight="bold" fill="#1b2733">{{ circuit.v_c }}</text>{% endif %}
+            {% if circuit.v_e %}<text x="352" y="278" font-size="14" font-weight="bold" fill="#1b2733">{{ circuit.v_e }}</text>{% endif %}
+        </svg>
+    </div>
+</div>

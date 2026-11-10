@@ -160,3 +160,19 @@ table.results tbody tr:nth-child(even) { background: #f7fbfe; }
     .form-grid { grid-template-columns: 1fr; }
     .card { padding: 16px; }
 }
+
+/* แผนผังวงจร (Circuit Diagram) */
+.circuit-card h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--blue);
+    font-size: 1.15rem;
+    margin: 0 0 14px;
+}
+
+.circuit-card .icon-zig { flex: none; }
+
+.circuit-card .circuit-wrap { display: flex; justify-content: center; }
+
+svg.circuit { max-width: 100%; height: auto; display: block; }

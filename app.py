@@ -67,6 +67,43 @@ def build_rows(results):
     ]
 
 
+def _typed_number(form, name, positive=False):
+    """คืนสตริงตัวเลขตามที่ผู้ใช้พิมพ์ ถ้าผ่านเงื่อนไข — None ถ้าว่าง/ขยะ/non-finite/ติดลบ(ถ้าบังคับ)"""
+    raw = (form.get(name) or "").strip()
+    if not raw:
+        return None
+    try:
+        value = float(raw)
+    except ValueError:
+        return None
+    if not math.isfinite(value):
+        return None
+    if positive and value <= 0:
+        return None
+    return raw
+
+
+def build_circuit_labels(form, results):
+    """สร้าง label ค่าบนแผนผังวงจร — input ตามที่พิมพ์ + แรงดันโหนดเมื่อคำนวณแล้ว"""
+    circuit = {}
+    vcc = _typed_number(form, "vcc", positive=True)
+    circuit["vcc"] = "%s V" % vcc if vcc is not None else None
+    for name in ("r1", "r2", "rc", "re"):
+        raw = _typed_number(form, name, positive=True)
+        circuit[name] = "%s kΩ" % raw if raw is not None else None
+    beta = _typed_number(form, "beta", positive=True)
+    vbe = _typed_number(form, "vbe")
+    circuit["npn"] = "NPN (β = %s)" % beta if beta is not None else "NPN"
+    circuit["vbe_note"] = "VBE = %s V" % vbe if vbe is not None else None
+    if results is not None:
+        circuit["v_b"] = "VB = %.3f V" % results["v_b"]
+        circuit["v_e"] = "VE = %.3f V" % results["v_e"]
+        circuit["v_c"] = "VC = %.3f V" % results["v_c"]
+    else:
+        circuit["v_b"] = circuit["v_e"] = circuit["v_c"] = None
+    return circuit
+
+
 def _form_context(form=None):
     """context ร่วมสำหรับ index.html — form เป็น dict[str, str] 7 คีย์"""
     if form is None:
@@ -80,6 +117,7 @@ def index():
         "index.html",
         fields=FIELDS,
         form=_form_context(),
+        circuit=build_circuit_labels({}, None),
         errors=[],
         warnings=[],
         rows=[],
@@ -94,18 +132,21 @@ def calculate():
     errors = parse_errors
     warnings = []
     rows = []
+    results = None
 
     if not errors:
         out = solve_dc_bias(**values)
         errors = out["errors"]
         warnings = out["warnings"]
         if out["results"] is not None:
-            rows = build_rows(out["results"])
+            results = out["results"]
+            rows = build_rows(results)
 
     return render_template(
         "index.html",
         fields=FIELDS,
         form=_form_context(raw_form),
+        circuit=build_circuit_labels(raw_form, results),
         errors=errors,
         warnings=warnings,
         rows=rows,
