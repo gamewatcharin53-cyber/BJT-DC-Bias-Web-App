@@ -73,7 +73,7 @@ flask --app app run --debug
 python -m unittest discover -s tests -v
 ```
 
-ผลที่คาดหวัง: **18 tests OK** (9 engineering + 9 web)
+ผลที่คาดหวัง: **19 tests OK** (9 engineering + 10 web)
 
 ## ชุดข้อมูลทดลอง
 

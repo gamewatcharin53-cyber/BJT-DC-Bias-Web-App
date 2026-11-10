@@ -6,6 +6,8 @@ app.py รับ HTTP request แปลงหน่วย (kΩ → Ω) แล้
 
 from flask import Flask, render_template, request
 
+import math
+
 from dc_bias import solve_dc_bias
 
 app = Flask(__name__)
@@ -39,6 +41,9 @@ def parse_form(form):
         try:
             value = float(raw)
         except ValueError:
+            errors.append(f"{label.split(' ')[0]} ต้องกรอกเป็นตัวเลข")
+            continue
+        if not math.isfinite(value):
             errors.append(f"{label.split(' ')[0]} ต้องกรอกเป็นตัวเลข")
             continue
         if name in KOHM_FIELDS:

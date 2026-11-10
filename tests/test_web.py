@@ -61,6 +61,13 @@ class TestWeb(unittest.TestCase):
         self.assertEqual(rv.status_code, 200)
         self.assertIn("Saturation", rv.get_data(as_text=True))
 
+    def test_post_non_finite(self):
+        rv = self.client.post("/calculate", data={**VALID, "vcc": "inf"})
+        self.assertEqual(rv.status_code, 200)
+        html = rv.get_data(as_text=True)
+        self.assertIn("VCC ต้องกรอกเป็นตัวเลข", html)
+        self.assertNotIn("VCE (Collector-Emitter)", html)
+
     def test_get_calculate_405(self):
         rv = self.client.get("/calculate")
         self.assertEqual(rv.status_code, 405)
