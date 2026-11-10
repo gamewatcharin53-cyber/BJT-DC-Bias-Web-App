@@ -1,0 +1,162 @@
+/* BJT DC Bias Web App — Lab 02 ENG29 2121 */
+
+:root {
+    --navy: #103658;
+    --blue: #1d638b;
+    --teal: #0c8078;
+    --paper: #f5f8fc;
+    --ink: #17344b;
+    --muted: #546d83;
+    --line: #d3e0ec;
+    --red-bg: #fdecea;
+    --red-line: #b3261e;
+    --orange-bg: #fff4e9;
+    --orange-line: #b85c2c;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    background: var(--paper);
+    color: var(--ink);
+    font: 16px/1.6 Tahoma, "Noto Sans Thai", "Leelawadee UI", Arial, sans-serif;
+    margin: 0;
+}
+
+.container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+}
+
+header h1 {
+    color: var(--navy);
+    font-size: 1.7rem;
+    margin: 0 0 6px;
+}
+
+.subtitle {
+    color: var(--muted);
+    margin: 0 0 20px;
+}
+
+.card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 22px 26px;
+    margin: 16px 0;
+}
+
+.form-card h2, .results-card h2 {
+    color: var(--blue);
+    font-size: 1.15rem;
+    margin: 0 0 14px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 18px;
+}
+
+.field label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--navy);
+    margin-bottom: 4px;
+}
+
+.input-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.input-row input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font: inherit;
+    min-width: 0;
+}
+
+.input-row input:focus {
+    outline: 2px solid var(--teal);
+    outline-offset: -1px;
+    border-color: var(--teal);
+}
+
+.unit {
+    color: var(--muted);
+    font-size: 0.85rem;
+    min-width: 26px;
+}
+
+.btn-calculate {
+    margin-top: 18px;
+    background: var(--teal);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 24px;
+    font: inherit;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-calculate:hover { background: var(--blue); }
+
+.errors {
+    background: var(--red-bg);
+    border-left: 4px solid var(--red-line);
+    color: var(--red-line);
+    padding: 12px 15px;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 14px;
+}
+
+.warnings {
+    background: var(--orange-bg);
+    border-left: 4px solid var(--orange-line);
+    color: #7a3d1c;
+    padding: 12px 15px;
+    border-radius: 0 6px 6px 0;
+    margin: 16px 0;
+}
+
+.errors ul, .warnings ul { margin: 6px 0 0; padding-left: 20px; }
+.errors li, .warnings li { margin: 3px 0; }
+
+table.results {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.95rem;
+}
+
+table.results th, table.results td {
+    border: 1px solid var(--line);
+    padding: 9px 12px;
+    text-align: left;
+}
+
+table.results th {
+    background: #e6f1fa;
+    color: var(--navy);
+}
+
+table.results td:last-child { font-weight: bold; white-space: nowrap; }
+table.results tbody tr:nth-child(even) { background: #f7fbfe; }
+
+.hint {
+    color: var(--muted);
+    font-size: 0.82rem;
+    margin: 10px 0 0;
+}
+
+@media (max-width: 560px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .card { padding: 16px; }
+}
