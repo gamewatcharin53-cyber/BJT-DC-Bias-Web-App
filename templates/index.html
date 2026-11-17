@@ -10,23 +10,39 @@
     <div class="container">
         <header>
             <h1>BJT DC Bias Calculator</h1>
-            <p class="subtitle">วงจรขยาย Common-Emitter แบบ Voltage-Divider Bias (NPN)
+            <p class="subtitle">วงจรขยาย Common-Emitter (NPN) 3 โหมด — Voltage Divider Bias,
+            Fixed Bias และ Emitter Bias (single supply)
             — แบบจำลอง Forward-Active: β คงที่, VBE คงที่</p>
         </header>
 
+        <form method="get" action="/" class="card mode-card">
+            <h2>เลือกโหมดวงจร</h2>
+            <div class="mode-row">
+                <label for="mode">โหมดไบอัส</label>
+                <select id="mode" name="mode">
+                    {% for value, label in mode_options %}
+                    <option value="{{ value }}"{% if value == mode %} selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn-mode">เปลี่ยนโหมด</button>
+            </div>
+        </form>
+
+        {% if errors %}
+        <div class="errors" role="alert">
+            <strong>พบข้อผิดพลาด{% if mode_label %} ({{ mode_label }}){% endif %}:</strong>
+            <ul>
+                {% for error in errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if mode_valid %}
         <form method="post" action="/calculate" class="card form-card">
             <h2>ค่าวงจรที่ต้องการคำนวณ</h2>
-
-            {% if errors %}
-            <div class="errors" role="alert">
-                <strong>พบข้อผิดพลาด:</strong>
-                <ul>
-                    {% for error in errors %}
-                    <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            {% endif %}
+            <input type="hidden" name="mode" value="{{ mode }}">
 
             <div class="form-grid">
                 {% for name, label, unit, placeholder in fields %}
@@ -44,10 +60,11 @@
 
             <button type="submit" class="btn-calculate">Calculate DC Bias</button>
         </form>
+        {% endif %}
 
         {% if warnings %}
         <div class="warnings" role="alert">
-            <strong>คำเตือน — ผลลัพธ์อยู่นอกสมมติฐานแบบจำลอง:</strong>
+            <strong>คำเตือน — {{ mode_label }}:</strong>
             <ul>
                 {% for warning in warnings %}
                 <li>{{ warning }}</li>
@@ -56,11 +73,11 @@
         </div>
         {% endif %}
 
-        {% include 'circuit.html' %}
+        {% if circuit %}{% include 'circuit.html' %}{% endif %}
 
         {% if rows %}
         <div class="card results-card">
-            <h2>DC Bias Results (Q-Point)</h2>
+            <h2>DC Bias Results (Q-Point) — {{ mode_label }}</h2>
             <table class="results">
                 <thead>
                     <tr>

@@ -1,6 +1,6 @@
 # AGENTS.md — แนวทางสำหรับ AI Agent ที่ทำงานใน repo นี้
 
-โปรเจกต์: Flask Web App คำนวณ BJT DC Bias (Lab 02, ENG29 2121)
+โปรเจกต์: Flask Web App คำนวณ BJT DC Bias 3 โหมด (Lab 02–03, ENG29 2121)
 
 ## สภาพแวดล้อมเครื่องนี้
 
@@ -18,10 +18,16 @@
 - `templates/index.html` = แสดงผลอย่างเดียว — ไม่มีสมการหรือตัวเลขผลลัพธ์
   ฝังอยู่ใน HTML
 - ผลลัพธ์ทุกตัวต้องมาจากการคำนวณของ Python Backend — **ห้ามฮาร์ดโค้ด**
+- `app.py` เป็นที่เลือกโหมด (`divider`/`fixed`/`emitter`), ตรวจเฉพาะฟิลด์
+  ของโหมด และแปลงหน่วย kΩ→Ω; `dc_bias.py` มี 3 ฟังก์ชันแยกตามวงจร
+- **ห้าม**ย้ายเงื่อนไขโหมดหรือ HTML ลงใน `dc_bias.py`
 
 ## แนวทางการแก้ไขโค้ด
 
 - **TDD**: เขียน test ก่อน ดูมัน fail แล้วค่อยแก้ implementation
+  — ยกเว้น Lab 03 ที่ใบงานห้ามเพิ่ม unittest/Playwright script:
+  ใช้ tests เดิมเป็น regression guard + ตรวจรับผ่าน browser
+  แล้วบันทึกผลใน `docs/validation.md`
 - เมื่อแก้สมการใน `dc_bias.py` — ไม่ต้องแก้ HTML (ผลเชื่อมผ่าน Jinja)
 - ข้อความ UI เป็นภาษาไทย + ศัพท์เทคนิคอังกฤษ (VB, VE, IC ฯลฯ)
 - ค่าอ้างอิงตรวจรับ (VCC=12, R1=100k, R2=22k, RC=2.2k, RE=1k, β=100,

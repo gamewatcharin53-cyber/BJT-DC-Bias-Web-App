@@ -1,14 +1,14 @@
-"""Flask application — BJT DC Bias Web App (Lab 02, ENG29 2121).
+"""Flask application — BJT DC Bias Web App (Lab 03, ENG29 2121).
 
-app.py รับ HTTP request แปลงหน่วย (kΩ → Ω) แล้วเรียก dc_bias.solve_dc_bias
-ซึ่งเป็น engineering module ที่ไม่รู้จัก HTML/HTTP
+app.py รับ HTTP request แปลงหน่วย (kΩ → Ω) แล้ว dispatch ไปฟังก์ชันใน dc_bias
+ตามโหมดวงจร — dc_bias เป็น engineering module ที่ไม่รู้จัก HTML/HTTP
 """
 
 from flask import Flask, render_template, request
 
 import math
 
-from dc_bias import solve_dc_bias
+from dc_bias import solve_dc_bias, solve_emitter_bias, solve_fixed_bias
 
 app = Flask(__name__)
 
@@ -23,17 +23,44 @@ FIELDS = [
     ("vbe", "VBE (Base-Emitter)", "V", "0.70"),
 ]
 
-KOHM_FIELDS = {"r1", "r2", "rc", "re"}
+RB_FIELD = ("rb", "RB (Base Bias)", "kΩ", "1000")
+FIELD_LOOKUP = {field[0]: field for field in FIELDS + [RB_FIELD]}
+
+MODE_LABELS = {
+    "divider": "Voltage Divider Bias",
+    "fixed": "Fixed Bias",
+    "emitter": "Emitter Bias (single supply)",
+}
+
+MODE_FIELDS = {
+    "divider": ["vcc", "r1", "r2", "rc", "re", "beta", "vbe"],
+    "fixed": ["vcc", "rb", "rc", "beta", "vbe"],
+    "emitter": ["vcc", "rb", "rc", "re", "beta", "vbe"],
+}
+
+SOLVERS = {
+    "divider": solve_dc_bias,
+    "fixed": solve_fixed_bias,
+    "emitter": solve_emitter_bias,
+}
+
+KOHM_FIELDS = {"r1", "r2", "rc", "re", "rb"}
 
 
-def parse_form(form):
+def fields_for(mode):
+    """คืน metadata ฟิลด์ (name, label, unit, placeholder) ตามลำดับของโหมด"""
+    return [FIELD_LOOKUP[name] for name in MODE_FIELDS[mode]]
+
+
+def parse_form(form, mode):
     """แปลงค่าจากฟอร์มเป็น float พร้อมหน่วย SI (ตัวต้านทาน kΩ → Ω)
 
-    Returns (values dict สำหรับส่งเข้า solve_dc_bias, errors list)
+    ตรวจเฉพาะฟิลด์ที่โหมดนั้นใช้
+    Returns (values dict สำหรับส่งเข้า solver, errors list)
     """
     values = {}
     errors = []
-    for name, label, _unit, _placeholder in FIELDS:
+    for name, label, _unit, _placeholder in fields_for(mode):
         raw = (form.get(name) or "").strip()
         if not raw:
             errors.append(f"{label.split(' ')[0]} ต้องกรอกเป็นตัวเลข")
@@ -54,8 +81,8 @@ def parse_form(form):
 
 
 def build_rows(results):
-    """สร้างแถวผลลัพธ์ [{label, value}] พร้อมหน่วยจาก results ของ solve_dc_bias"""
-    return [
+    """สร้างแถวผลลัพธ์ [{label, value}] พร้อมหน่วย — VTH/RTH เฉพาะ Divider"""
+    rows = [
         ("VB (Base Voltage)", "%.3f V" % results["v_b"]),
         ("VE (Emitter Voltage)", "%.3f V" % results["v_e"]),
         ("VC (Collector Voltage)", "%.3f V" % results["v_c"]),
@@ -63,9 +90,11 @@ def build_rows(results):
         ("IC (Collector Current)", "%.3f mA" % (results["ic"] * 1e3)),
         ("IB (Base Current)", "%.3f µA" % (results["ib"] * 1e6)),
         ("IE (Emitter Current)", "%.3f mA" % (results["ie"] * 1e3)),
-        ("VTH (Thevenin Voltage)", "%.3f V" % results["v_th"]),
-        ("RTH (Thevenin Resistance)", "%.3f kΩ" % (results["r_th"] / 1e3)),
     ]
+    if "v_th" in results:
+        rows.append(("VTH (Thevenin Voltage)", "%.3f V" % results["v_th"]))
+        rows.append(("RTH (Thevenin Resistance)", "%.3f kΩ" % (results["r_th"] / 1e3)))
+    return rows
 
 
 def _typed_number(form, name, positive=False):
@@ -107,21 +136,28 @@ def build_circuit_labels(form, results):
     return circuit
 
 
-def _form_context(form=None):
-    """context ร่วมสำหรับ index.html — form เป็น dict[str, str] 7 คีย์"""
+def _form_context(fields, form=None):
+    """context ร่วมสำหรับ index.html — คีย์ตรงกับฟิลด์ของโหมดที่เลือก"""
     if form is None:
-        return {name: "" for name, _l, _u, _p in FIELDS}
-    return {name: form.get(name, "") for name, _l, _u, _p in FIELDS}
+        return {name: "" for name, _l, _u, _p in fields}
+    return {name: form.get(name, "") for name, _l, _u, _p in fields}
 
 
 @app.route("/")
 def index():
+    mode = (request.args.get("mode") or "").strip() or "divider"
+    valid = mode in MODE_LABELS
+    fields = fields_for(mode) if valid else []
     return render_template(
         "index.html",
-        fields=FIELDS,
-        form=_form_context(),
-        circuit=build_circuit_labels({}, None),
-        errors=[],
+        mode=mode,
+        mode_label=MODE_LABELS.get(mode, mode),
+        mode_valid=valid,
+        mode_options=list(MODE_LABELS.items()),
+        fields=fields,
+        form=_form_context(fields),
+        circuit=build_circuit_labels({}, None) if mode == "divider" else None,
+        errors=[] if valid else [f"ไม่รู้จักโหมดวงจร: {mode}"],
         warnings=[],
         rows=[],
     )
@@ -130,26 +166,37 @@ def index():
 @app.route("/calculate", methods=["POST"])
 def calculate():
     raw_form = request.form.to_dict()
-    values, parse_errors = parse_form(raw_form)
+    mode = (raw_form.get("mode") or "").strip() or "divider"
+    valid = mode in MODE_LABELS
+    fields = fields_for(mode) if valid else []
 
-    errors = parse_errors
+    errors = [] if valid else [f"ไม่รู้จักโหมดวงจร: {mode}"]
     warnings = []
     rows = []
     results = None
+    circuit = None
 
-    if not errors:
-        out = solve_dc_bias(**values)
-        errors = out["errors"]
-        warnings = out["warnings"]
-        if out["results"] is not None:
-            results = out["results"]
-            rows = build_rows(results)
+    if valid:
+        values, errors = parse_form(raw_form, mode)
+        if not errors:
+            out = SOLVERS[mode](**values)
+            errors = out["errors"]
+            warnings = out["warnings"]
+            if out["results"] is not None:
+                results = out["results"]
+                rows = build_rows(results)
+        if mode == "divider":
+            circuit = build_circuit_labels(raw_form, results)
 
     return render_template(
         "index.html",
-        fields=FIELDS,
-        form=_form_context(raw_form),
-        circuit=build_circuit_labels(raw_form, results),
+        mode=mode,
+        mode_label=MODE_LABELS.get(mode, mode),
+        mode_valid=valid,
+        mode_options=list(MODE_LABELS.items()),
+        fields=fields,
+        form=_form_context(fields, raw_form),
+        circuit=circuit,
         errors=errors,
         warnings=warnings,
         rows=rows,
