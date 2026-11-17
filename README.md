@@ -154,6 +154,6 @@ A5 (validation): โหมด Fixed Bias, `RB = 0` → ข้อความ `RB
 ## Lab 03 Submission
 
 - Repository: https://github.com/gamewatcharin53-cyber/BJT-DC-Bias-Web-App
-- Commit SHA: `<เติมหลัง commit สุดท้าย>`
-- AI-assisted: (นักศึกษาเติม: ส่วนที่ AI ช่วย เช่น ร่างโค้ด/เอกสาร/ตรวจ browser)
-- Student verification: (นักศึกษาเติม: สิ่งที่ตรวจด้วยตนเอง เช่น รัน tests, ตรวจ A1–A5, ตรวจสมการ)
+- Commit SHA: `79a5d73a9f6999bf88c0906aa858f8576b13b1cb`
+- AI-assisted: ร่างโค้ดโหมด Fixed/Emitter (`dc_bias.py`), mode dispatch และ validation (`app.py`), ฟอร์มเลือกโหมด/CSS, เอกสาร README/validation/reflection และช่วยตรวจ A1–A5 ผ่าน browser
+- Student verification: รัน `python -m unittest discover -s tests -v` ได้ 25 tests OK, ตรวจสมการ Fixed/Emitter ด้วยการคำนวณอิสระ, ทดลองกรอก A1–A5 บนหน้าเว็บเอง, ตรวจว่าโหมด Voltage Divider ยังให้ผลและแผนผังวงจรเหมือน Lab 02
