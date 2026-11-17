@@ -43,11 +43,12 @@ def parse_form(form):
         except ValueError:
             errors.append(f"{label.split(' ')[0]} ต้องกรอกเป็นตัวเลข")
             continue
+        if name in KOHM_FIELDS:
+            value *= 1000.0
+        # ตรวจหลังแปลงหน่วย — 2e305 kΩ × 1000 → inf (finite ก่อนคูณ)
         if not math.isfinite(value):
             errors.append(f"{label.split(' ')[0]} ต้องกรอกเป็นตัวเลข")
             continue
-        if name in KOHM_FIELDS:
-            value *= 1000.0
         values[name] = value
     return values, errors
 
@@ -76,6 +77,8 @@ def _typed_number(form, name, positive=False):
         value = float(raw)
     except ValueError:
         return None
+    if name in KOHM_FIELDS:
+        value *= 1000.0
     if not math.isfinite(value):
         return None
     if positive and value <= 0:

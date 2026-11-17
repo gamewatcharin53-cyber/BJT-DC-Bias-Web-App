@@ -24,17 +24,19 @@ VCE = 8.052 V > 0.3 V และ VTH > VBE → **Active region** ไม่มี�
 
 คำสั่ง: `python -m unittest discover -s tests -v` (จาก root ของ repo, ใน venv)
 
-ผล: **Ran 23 tests — OK**
+ผล: **Ran 25 tests — OK**
 
 - `tests/test_dc_bias.py` — 9 tests วิศวกรรม: ค่าอ้างอิง, validation (R1=0,
   β=0, VCC ติดลบ), Cutoff warning, Saturation warning, ขอบเขต VTH=VBE,
   ค่าสุดขั้ว (β=10¹², VBE ติดลบ)
-- `tests/test_web.py` — 14 tests ผ่าน Flask test client: GET / (200 + ฟอร์ม),
+- `tests/test_web.py` — 16 tests ผ่าน Flask test client: GET / (200 + ฟอร์ม),
   POST ค่าถูกต้อง, กรอกไม่ใช่ตัวเลข (`abc`, `2,2`), ฟิลด์ขาด, R ติดลบ,
   ค่าไม่จำกัด (`inf`), คำเตือน Cutoff/Saturation แสดงบนหน้าเว็บ,
   GET /calculate → 405, และแผนผังวงจร (GET / ยังไม่มีค่า, POST valid
-  ค่า input + VB/VE/VC ขึ้นบนรูป, ค่า invalid ไม่ถูก echo, Cutoff ยัง
-  แสดงค่า input)
+  ค่า input + VB/VE/VC ขึ้นบนรูป, ค่า invalid ไม่ถูก echo — รวม `nan`,
+  VBE/β ไม่ถูกต้อง → แสดงแค่ "NPN" ไม่มีหมายเหตุ VBE, Cutoff/Saturation
+  ยังแสดงค่า input และแรงดันโหนด, ค่า overflow `2e305` kΩ ถูกปฏิเสธ
+  ไม่แสดง `nan` ทั้งตารางและรูป)
 
 ## 3. ตรวจ HTTP จริงผ่าน Flask Server (เกณฑ์ A1, A2, A4, A5)
 
@@ -54,7 +56,7 @@ VCE = 8.052 V > 0.3 V และ VTH > VBE → **Active region** ไม่มี�
 ## 4. Reproducibility (เกณฑ์ A7)
 
 ลบ `.venv` ทั้งโฟลเดอร์ → สร้างใหม่ด้วย `py -m venv .venv` →
-`pip install -r requirements.txt` → รัน tests → **18 tests OK**
+`pip install -r requirements.txt` → รัน tests → **25 tests OK**
 (ตามขั้นตอนใน README จากไฟล์ว่าง)
 
 ## 5. ข้อจำกัดของแบบจำลอง

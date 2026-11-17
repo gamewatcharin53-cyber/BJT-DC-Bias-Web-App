@@ -103,6 +103,16 @@ class TestWeb(unittest.TestCase):
         rv = self.client.post("/calculate", data={**VALID, "vcc": "inf"})
         html = rv.get_data(as_text=True)
         self.assertNotIn("inf V", html)
+        rv = self.client.post("/calculate", data={**VALID, "vcc": "nan"})
+        html = rv.get_data(as_text=True)
+        self.assertNotIn("nan V", html)
+        rv = self.client.post("/calculate", data={**VALID, "vbe": "abc"})
+        html = rv.get_data(as_text=True)
+        self.assertNotIn("VBE =", html)
+        rv = self.client.post("/calculate", data={**VALID, "beta": "abc"})
+        html = rv.get_data(as_text=True)
+        self.assertIn(">NPN</text>", html)
+        self.assertNotIn("NPN (β =", html)
 
     def test_post_cutoff_shows_input_values(self):
         rv = self.client.post("/calculate", data={**VALID, "r2": "1.5"})
@@ -111,6 +121,28 @@ class TestWeb(unittest.TestCase):
         self.assertIn("Cutoff", html)
         self.assertIn("1.5 kΩ", html)
         self.assertIn("VB =", html)
+
+    def test_post_saturation_shows_input_values(self):
+        rv = self.client.post("/calculate",
+                              data={"vcc": "2", "r1": "10", "r2": "10",
+                                    "rc": "0.39", "re": "0.01",
+                                    "beta": "100", "vbe": "0.7"})
+        self.assertEqual(rv.status_code, 200)
+        html = rv.get_data(as_text=True)
+        self.assertIn("Saturation", html)
+        self.assertIn("0.39 kΩ", html)
+        self.assertIn("VB =", html)
+        self.assertIn("VE =", html)
+        self.assertIn("VC =", html)
+
+    def test_post_overflow_resistor_no_nan(self):
+        rv = self.client.post("/calculate", data={**VALID, "r1": "2e305"})
+        self.assertEqual(rv.status_code, 200)
+        html = rv.get_data(as_text=True)
+        self.assertIn("R1 ต้องกรอกเป็นตัวเลข", html)
+        self.assertNotIn("nan V", html)
+        self.assertNotIn("VB =", html)
+        self.assertNotIn("2e305 kΩ", html)
 
     def test_get_calculate_405(self):
         rv = self.client.get("/calculate")

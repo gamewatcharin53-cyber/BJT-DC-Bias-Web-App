@@ -35,7 +35,7 @@ BJT DC Bias Web App/
 ├── static/style.css        # การแสดงผล
 ├── tests/
 │   ├── test_dc_bias.py     # unit tests วิศวกรรม (9 tests)
-│   └── test_web.py         # Flask test client tests (14 tests)
+│   └── test_web.py         # Flask test client tests (16 tests)
 ├── requirements.txt        # Flask
 └── docs/                   # design-note, validation, reflection
 ```
@@ -83,7 +83,7 @@ flask --app app run --debug
 python -m unittest discover -s tests -v
 ```
 
-ผลที่คาดหวัง: **23 tests OK** (9 engineering + 14 web)
+ผลที่คาดหวัง: **25 tests OK** (9 engineering + 16 web)
 
 ## ชุดข้อมูลทดลอง
 
